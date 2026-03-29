@@ -1,0 +1,11 @@
+[server]
+headless = true
+
+[runner]
+magicEnabled = false
+
+[global]
+developmentMode = false
+
+[python]
+version = "3.11"
