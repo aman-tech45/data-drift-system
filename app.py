@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-import os
 from drift.detector import detect_drift
-from drift.visualization import plot_feature_distribution
 
 st.set_page_config(page_title="Data Drift Detection System", layout="wide")
 
@@ -48,8 +46,8 @@ if ref_file and cur_file:
     st.subheader("🧠 Summary Insights")
 
     total_features = len(report)
-    drifted = report["drift_detected"].sum()
-    moderate = (report["psi_status"] == "moderate_drift").sum()
+    drifted = int(report["drift_detected"].sum())
+    moderate = int((report["psi_status"] == "moderate_drift").sum())
 
     st.write(f"✅ Total Features: {total_features}")
     st.write(f"⚠️ Features with Drift: {drifted}")
@@ -66,15 +64,18 @@ if ref_file and cur_file:
         mime="text/csv",
     )
 
-    # ---- Visualization ----
-    plot_feature_distribution(ref_df, cur_df, output_dir="plots")
-
+    # ---- Visualization (STREAMLIT NATIVE) ----
     st.subheader("📈 Feature Distributions")
 
     for col in ref_df.columns:
-        img_path = os.path.join("plots", f"{col}_distribution.png")
-        if os.path.exists(img_path):
-            st.image(img_path, caption=f"{col} Distribution", use_container_width=True)
+        st.write(f"### {col}")
+
+        chart_df = pd.DataFrame({
+            "Reference": ref_df[col],
+            "Current": cur_df[col]
+        })
+
+        st.line_chart(chart_df)
 
 else:
     st.info("👈 Upload both datasets to begin")
